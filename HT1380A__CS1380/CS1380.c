@@ -49,8 +49,8 @@ uint8 days_Calc(void)
 		case 5:
 		case 7:
 		case 8:
-		case 10:
-		case 12:days = 0x31; break;
+		case 0x10:
+		case 0x12:days = 0x31; break;
 		
 		case 2: 
 				if (((year%4 == 0) && (year%100 != 0)) || (year%400 == 0))	days = 0x29;
@@ -58,7 +58,7 @@ uint8 days_Calc(void)
 		case 4:
 		case 6:
 		case 9:
-		case 11: days = 0x30;break;
+		case 0x11: days = 0x30;break;
 		default: days = 0x32;break;
 	}
 	return days;

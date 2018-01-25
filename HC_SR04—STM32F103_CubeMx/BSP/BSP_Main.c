@@ -14,7 +14,7 @@ void BSP_Main(void)
 	
 	while(1)
 	{
-		Ranging_Text();
+		HAL_GPIO_TogglePin(LED_GPIO_Port,LED_Pin);
 		HAL_Delay(1000);
 	}
 }

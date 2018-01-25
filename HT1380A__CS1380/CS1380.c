@@ -4,7 +4,7 @@
 	功能：HT1381A/CS1380/HT1380A驱动
 	by: simple小强哥
 	github:LifeSimpleLwq
-	qq: 997950763 存在bug请练习本人更改，thanks
+	qq: 997950763 存在bug请联系本人更改，thanks
 */
 
 /**

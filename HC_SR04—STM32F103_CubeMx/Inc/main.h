@@ -41,8 +41,8 @@
 
 /* Private define ------------------------------------------------------------*/
 
-#define LED_Pin GPIO_PIN_8
-#define LED_GPIO_Port GPIOA
+#define LED_Pin GPIO_PIN_13
+#define LED_GPIO_Port GPIOC
 #define SR04_Echo_Pin GPIO_PIN_4
 #define SR04_Echo_GPIO_Port GPIOB
 #define SR04_Trig_Pin GPIO_PIN_5

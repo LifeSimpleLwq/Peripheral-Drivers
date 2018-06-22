@@ -6,9 +6,14 @@
 */
 #include "BSP/key.h"
 
-uint8 idata KeyBackup = 0;
-uint8 idata KeyNum = 0;
+static uint8 idata KeyBackup = 0;
+static uint8 idata KeyNum = 0;
 
+/**
+  * @brief  KEY_Updata
+  * @note   建议调用时间<=10ms，低电平按下
+  * @retval NONE
+  */
 void KEY_Updata(void)
 {
 	KeyNum = 0;
@@ -26,16 +31,17 @@ void KEY_Updata(void)
 	switch (KeyNum)
 	{
 		/**
-		 * 此处添加对应按键反馈程序
+		 * 此处添加按键动作程序
 		 */
 	default :  KeyNum = 0;
 		break;
 	}
 }
 
+enum {Init1_State,Affirm1_State,Single1_State,Repeat1_State};
 /**
   * @brief  KEY_Scan
-  * @note   建议调用时间<=10ms，用于消抖
+  * @note   建议调用时间<=10ms，低电平按下
   * @retval NONE
   */	 
 void KEY_Scan(uint8 k,uint8 n)

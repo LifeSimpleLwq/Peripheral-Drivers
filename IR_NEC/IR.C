@@ -4,11 +4,16 @@
 #define		TH2_TMP		(65536-Tim2_100us)/256
 #define		TL2_TMP		(65536-Tim2_100us)%256
 
-uint16 IR_conunt = 0;  // 计时器
-uint8 IR_time[33];	
-uint8 IR_data[4];
+static uint16 IR_conunt = 0;  // 计时器
+static uint8 IR_time[33];	
+static uint8 IR_data[4];
 bit conunt_ok = 0,decode_ok = 0,IR_TMP = 1,long_flag = 0; 	 
 
+/**
+  * @brief  IR_Check
+  * @note   IR状态改变时判断接收情况
+  * @retval NONE
+  */
 void IR_Check(void)
 {
 	if (IR_TMP != IR)		
@@ -48,6 +53,11 @@ void IR_Check(void)
 	}	
 }
 
+/**
+  * @brief  EX0_ISR
+  * @note   IR 下降沿时保存一个周期时间
+  * @retval NONE
+  */
 void EX0_ISR(void)
 {
 	static uint8 num = 0;
@@ -75,6 +85,11 @@ void EX0_ISR(void)
 	IR_conunt = 0;
 }
 
+/**
+  * @brief  IR_decode
+  * @note   IR Read data handle
+  * @retval NONE
+  */
 void IR_decode(void)
 {
 	uint8 IR_byte;
@@ -102,7 +117,11 @@ void IR_decode(void)
 	}
 }
 
-
+/**
+  * @brief  IR_Init
+  * @note   TIM2 init 100us
+  * @retval NONE
+  */
 void IR_Init(void)
 {	
 	TH2 = TH2_TMP;	
@@ -111,6 +130,11 @@ void IR_Init(void)
 	TR2 = 1;	
 } 
 
+/**
+  * @brief  TIMER2_int
+  * @note   TIM2 interrupt 100us
+  * @retval NONE
+  */
 void TIMER2_int(void) interrupt 5
 {
 	IR_conunt++;

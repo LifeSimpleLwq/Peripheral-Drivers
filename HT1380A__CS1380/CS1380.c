@@ -8,7 +8,7 @@
 */
 
 /**
-  * @brief  Data_Calc
+  * @brief  week_Calc	基姆拉尔森公式
   * @note   该IC不会根据日期自动调整星期，需手动调整
   * @retval NONE
   */
@@ -35,7 +35,7 @@ void week_Calc(void)
 
 
 /**
-  * @brief  Data_Calc
+  * @brief  days_Calc
   * @retval NONE
   */
 uint8 days_Calc(void)
@@ -72,8 +72,11 @@ uint8 days_Calc(void)
   */
 void CS1380_Init(void)
 {
+	char i;
 	Write_Byte(0x8e,0);	  	// 失能写保护
-	Write_Byte(0x80,0);	  	// 使能晶振
+	i = Read_Byte(0x81);
+	i &= 0x7f;
+	Write_Byte(0x80,i);	  	// 使能晶振
 	Write_Byte(0x8e,0x80);	// 使能写保护
 }
 
@@ -112,6 +115,7 @@ void Read_Data(void)
   */
 void Write_Data(void)
 {	
+	week_Calc();
 	Write_Byte(0x8e,0);	  // 失能写保护
 	Write_Byte(0x8C,numLcdTemp.year);
 	Write_Byte(0x8A,numLcdTemp.week);

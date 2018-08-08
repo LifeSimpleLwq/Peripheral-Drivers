@@ -1,6 +1,14 @@
 #include "BSP/sys.h"
 
+/**
+  *  该文件为8位机使用
+  */
 
+/**
+  * @brief  ClearXRAM
+  * @param  清除RAM
+  * @retval None
+  */
 void ClearXRAM(void)
 {
 	uint8 xdata * data l_p_ucXdata;
@@ -12,7 +20,11 @@ void ClearXRAM(void)
 	}
 }
 
-
+/**
+  * @brief  delay_ms
+  * @param  延时函数，具体根据MCU频率测定
+  * @retval None
+  */
 void delay_ms(uint16 y)
 {
 	uint16 x;

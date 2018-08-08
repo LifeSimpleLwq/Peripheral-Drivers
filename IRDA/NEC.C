@@ -1,39 +1,39 @@
-#include "BSP/IR.h"
+#include "BSP/IRDA_PIN.h"
 
 #define 	Tim2_100us	Fclk/1000/2/10	//  Fclk/1000/2 = 1ms	2个指令周期
 #define		TH2_TMP		(65536-Tim2_100us)/256
 #define		TL2_TMP		(65536-Tim2_100us)%256
 
-static uint16 IR_conunt = 0;  // 计时器
-static uint8 IR_time[33];	
-static uint8 IR_data[4];
-bit conunt_ok = 0,decode_ok = 0,IR_TMP = 1,long_flag = 0; 	 
+static uint16 IRDA_conunt = 0;  // 计时器
+static uint8 IRDA_time[33];	
+static uint8 IRDA_data[4];
+bit fCount_ok = 0,fDecode_ok = 0,IRDA_TMP = 1,fLong = 0; 	 
 
 /**
-  * @brief  IR_Check
-  * @note   IR状态改变时判断接收情况
+  * @brief  IRDA_Check
+  * @note   IRDA_PIN状态改变时判断接收情况
   * @retval NONE
   */
-void IR_Check(void)
+void IRDA_Check(void)
 {
-	if (IR_TMP != IR)		
+	if (IRDA_TMP != IRDA_PIN)		
 	{	
-		IR_TMP = IR;
-		if (IR)
+		IRDA_TMP = IRDA_PIN;
+		if (IRDA_PIN)
 		{		
-			if (conunt_ok) 
+			if (fCount_ok) 
 			{
-				IR_decode();
-				conunt_ok = 0;	
-				long_flag = 0;		
+				IRDA_decode();
+				fCount_ok = 0;	
+				fLong = 0;		
 			}
-			if (decode_ok)
+			if (fDecode_ok)
 			{
-				if (long_flag)	
+				if (fLong)	
 				{
-					long_flag = 0;
-					IR_conunt = 0;
-					IR_decode();
+					fLong = 0;
+					IRDA_conunt = 0;
+					IRDA_decode();
 				}											
 			}	   		
 		}
@@ -44,10 +44,10 @@ void IR_Check(void)
 		}
 	}
 	
-	if ( IR_conunt > 1500 ) 	
+	if ( IRDA_conunt > 1500 ) 	
 	{
-		decode_ok = 0;
-		IR_conunt = 0;
+		fDecode_ok = 0;
+		IRDA_conunt = 0;
 		UART1_SendData(0x66);
 		TR2 = 0;		
 	}	
@@ -55,7 +55,7 @@ void IR_Check(void)
 
 /**
   * @brief  EX0_ISR
-  * @note   IR 下降沿时保存一个周期时间
+  * @note   IRDA_PIN 下降沿时保存一个周期时间
   * @retval NONE
   */
 void EX0_ISR(void)
@@ -66,31 +66,31 @@ void EX0_ISR(void)
 	if(!start_flag)		start_flag = 1;
 	else if(start_flag)
 	{
-		if(IR_conunt >= 90 && IR_conunt < 160)		// 判断是否为9.5ms+4.5ms引导码
+		if(IRDA_conunt >= 90 && IRDA_conunt < 160)		// 判断是否为9.5ms+4.5ms引导码
 		{	
 			num = 0;
-			long_flag = 1;
+			fLong = 1;
 		}
 
-		IR_time[num] = IR_conunt;
+		IRDA_time[num] = IRDA_conunt;
 		num++;
 		if(33 == num)
 		{
 			num = 0;
 			start_flag = 0;			// 第一次中断标志位
-			conunt_ok = 1;			// 红外码接收完毕
+			fCount_ok = 1;			// 红外码接收完毕
 		}
 	}
 
-	IR_conunt = 0;
+	IRDA_conunt = 0;
 }
 
 /**
-  * @brief  IR_decode
-  * @note   IR Read data handle
+  * @brief  IRDA_decode
+  * @note   IRDA_PIN Read data handle
   * @retval NONE
   */
-void IR_decode(void)
+void IRDA_decode(void)
 {
 	uint8 IR_byte;
 	uint8 i = 0,j = 0;
@@ -98,31 +98,31 @@ void IR_decode(void)
 
 	for(i = 0; i < 4; i++)
 	{
-		IR_data[i] = 0;
+		IRDA_data[i] = 0;
 		for(j = 0; j < 8; j++)
 		{
-			if(IR_time[num] > 18)	IR_byte |= 0x80;	// 低位在前
+			if(IRDA_time[num] > 18)	IR_byte |= 0x80;	// 低位在前
 
 			if(j < 7)	IR_byte >>= 1;
 			num++;			
 		}
-		IR_data[i] = IR_byte;
+		IRDA_data[i] = IR_byte;
 		IR_byte = 0x00;	
 	}
 
-	if(IR_data[2] == ~IR_data[3])
+	if(IRDA_data[2] == ~IRDA_data[3])
 	{
-		decode_ok = 1;
-		UART1_SendData(IR_data[2]);
+		fDecode_ok = 1;
+		UART1_SendData(IRDA_data[2]);
 	}
 }
 
 /**
-  * @brief  IR_Init
+  * @brief  IRDA_Init
   * @note   TIM2 init 100us
   * @retval NONE
   */
-void IR_Init(void)
+void IRDA_Init(void)
 {	
 	TH2 = TH2_TMP;	
 	TL2 = TL2_TMP;
@@ -137,7 +137,7 @@ void IR_Init(void)
   */
 void TIMER2_int(void) interrupt 5
 {
-	IR_conunt++;
+	IRDA_conunt++;
 
 	TH2 = TH2_TMP;
 	TL2 = TL2_TMP;

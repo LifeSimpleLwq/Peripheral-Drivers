@@ -1,25 +1,33 @@
 ;支持长按短按
-;PT1Tmp	 : 按键状态寄存器
-;PT1Save : 按键保存寄存器 
+;KEYTmp	 : 按键状态寄存器
+;KEYSave : 按键保存寄存器 
+
+;将对应按键保存在 KEYTmp，在处理按键时可直接判断KEYn来处理任务
+;KEYTmp			EQU			50H
+;DEFINE			KEY1		KEYTmp,0
+;DEFINE			KEY2		KEYTmp,1
+;DEFINE			KEY3		KEYTmp,2
+;DEFINE			KEY4		KEYTmp,3
+
 KEY_pro:
-		btfss		KEY1msflag
+		btfss		fKEY1ms
 		return	
-		bcf			KEY1msflag
-			
+		bcf			fKEY1ms
 		
+		;此处添加读取按键操作
+		;将对应按键保存在 KEYTmp, 低电平表示按键使能
 		
-		movlw		00001000b
-		andwf		PT1,w
-		movwf		PT1Tmp
+		movlw		0ffh
+		andwf		KEYTmp		
 		
-		xorwf		PT1Save,w
+		xorwf		KEYSave,w
 		btfss		status,z
-		goto		PT1_Update
+		goto		KEY_Update
 		
 		incf		KEYms,f
 		
-		movlw		00001000b
-		xorwf		PT1Tmp,w
+		movlw		0ffh
+		xorwf		KEYTmp,w
 		goto		$+3
 		clrf		KEYms
 		return
@@ -27,87 +35,41 @@ KEY_pro:
 		movlw		50
 		xorwf		KEYms,w
 		btfsc		status,z
-		goto		PT1_Enable
+		goto		KEY_Enable
 		
-		movlw		200			;长按 100ms执行一次
-		xorwf		KEYms,w
+		movlw		200			;长按 100ms执行一次，修改此处可调整频率
+		xorwf		KEYms,w		
 		btfsc		status,z
-		goto		PT1_Enable
+		goto		KEY_Enable
 		
 		return
 
-PT1_Enable:
+KEY_Enable:
 		movlw		100
 		movwf		KEYms
-							
+		
+		btfss		fKEY	;屏蔽此三行代码可实现长按
+		return
+		bsf			fKEY
+		
 		;此处添加对应按键动作处理
-		;btfss		KEY			
-		;goto		KEY_Enable
+		;btfss		KEYx			
+		;goto		KEYx_Enable
 		
 		return
 
 PT1_Update:
-		movfw		PT1Tmp
-		movwf		PT1Save		
+		movfw		KEYTmp
+		movwf		KEYSave		
 		clrf		KEYLongTim
 		clrf		KEYms
-		bcf			keyflag
+		bcf			fKEY
 		
-		btfsc		KEY		
-		bcf			keyEnflag
 		return
 
-Buzz_B:
-		bsf			buzzflag	
-		movlw		1
-		movwf		buzzTim	
-		return		
-Buzz_BB:
-		bsf			buzzflag
-		movlw		3
-		movwf		buzzTim		
-		return
-Buzz_B_BB:			
-		bsf			buzzflag	
-		movlw		6
-		movwf		buzzTim			
-		return		
-; 工作倒计时		
-Buzz_pro:
-		btfss		buzz1sflag
-		return
-		bcf			buzz1sflag
 		
-		btfss		workflag
-		return
 		
-		movlw		1
-		subwf		workSecond,w
-		btfss		status,c
-		goto		$+3
-		decf		workSecond,f
-		return
-		
-		movlw		1
-		subwf		workNum,w
-		btfss		status,c
-		goto		$+10 ;8			
-		decf		workNum,f
-		movlw		29
-		movwf		workSecond
-		
-		btfsc		warningflag		;低压报警时，30/s“吡”不提示   V02
-		return
-		
-		bsf			buzzflag	;蜂鸣器响一声
-		movlw		1
-		movwf		buzzTim
-		return		
-		
-		bcf			workflag
-		clrf		MODE		;关机
-		goto		Buzz_B_BB	
-		return		
+	
 
 		
 		

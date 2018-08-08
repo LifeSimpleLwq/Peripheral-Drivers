@@ -3,6 +3,7 @@
 	by: simple小强哥
 	github:LifeSimpleLwq
 	qq: 997950763 存在bug请联系本人更改，Thanks
+	Version: 1.0.0
 */
 #include "BSP/key.h"
 
@@ -19,6 +20,7 @@ void KEY_Updata(void)
 	KeyNum = 0;
 	
 	// 根据需求增加按键
+	// KEY1~KEY4 为按键键值
 	if (!KeyBackup || KeyBackup == 1)	
 		KEY_Scan(KEY1,1);			
 	if (!KeyBackup || KeyBackup == 2)	
@@ -97,7 +99,7 @@ void KEY_Scan(uint8 k,uint8 n)
 			if(tmp == Time)
 			{
 				Time = 0;
-				KeyNum = n;
+				KeyNum = n;		// 屏蔽此处可取消长按
 				LcdTim = 0;
 			}
 			else if(Key1_Value)
